@@ -2,8 +2,6 @@ import json
 import time
 import urllib2
 
-# TODO: Add writing and reading graph from file
-# TODO: Find way to visualize graph
 
 class Node:
 
@@ -22,21 +20,35 @@ class Node:
 class Graph:
 
     def __init__(self):
-        self.nodes = {}
+        self._nodes = {}
 
     def add(self, node):
-        self.nodes[node.id] = node
+        self._nodes[node.id] = node
 
     def get(self, node_id):
-        return self.nodes[node_id]
+        return self._nodes[node_id]
 
     def add_edge(self, node_id1, node_id2):
         self.get(node_id1).add_connection(self.get(node_id2))
         self.get(node_id2).add_connection(self.get(node_id1))
 
     def print_graph(self):
-        for user_id in self.nodes:
-            print('{0} : {1}'.format(user_id, self.nodes[user_id].connections))
+        for user_id in self._nodes:
+            print('{0} : {1}'.format(user_id, self._nodes[user_id].connections))
+
+    def get_nodes(self):
+        return self._nodes.keys()
+
+    def get_edges(self):
+        edges = []
+        for key in self._nodes:
+            edges.append(self._nodes[key].connections)
+        return edges
+
+    def to_springy(self):
+        nodes = self.get_nodes()
+        edges = self.get_edges()
+        return (nodes, edges)
 
 
 def get_friends(user_id):
@@ -85,7 +97,13 @@ def bfs(graph):
 def find_bridges(graph):
     raise Error("Not implemented")
 
+
 if __name__ == '__main__':
     user_id = 42265807
     g = build_user_graph(user_id)
     g.print_graph()
+    with open('test.txt', 'w+') as f:
+        nodes, edges = g.to_springy()
+        f.write(str(nodes))
+        f.write('\n===\n')
+        f.write(str(edges))
