@@ -2,6 +2,8 @@ import json
 import time
 import urllib2
 
+# TODO: Add writing and reading graph from file
+# TODO: Find way to visualize graph
 
 class Node:
 
