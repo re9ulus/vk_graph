@@ -42,13 +42,22 @@ class Graph:
     def get_edges(self):
         edges = []
         for key in self._nodes:
-            edges.append(self._nodes[key].connections)
+            for node in self._nodes[key].connections:
+                edges.append([key, node])
         return edges
 
-    def to_springy(self):
-        nodes = self.get_nodes()
-        edges = self.get_edges()
+    def to_springy(self, undirected=False):
+        nodes = map(str, self.get_nodes())
+        edges = map(lambda ar: map(str, ar), self.get_edges())
+        if undirected:
+            edges = map(list, (list(set(map(tuple, map(sorted, edges))))))
         return (nodes, edges)
+
+    def save_springy_to_file(self, filename):
+        with open(filename, 'w+') as f:
+            nodes, edges = self.to_springy()
+            f.write('var nodes = ' + str(nodes) + ';\n')
+            f.write('var edges = ' + str(edges) + ';\n')
 
 
 def get_friends(user_id):
@@ -101,9 +110,5 @@ def find_bridges(graph):
 if __name__ == '__main__':
     user_id = 42265807
     g = build_user_graph(user_id)
+    g.save_springy_to_file('./test.json')
     g.print_graph()
-    with open('test.txt', 'w+') as f:
-        nodes, edges = g.to_springy()
-        f.write(str(nodes))
-        f.write('\n===\n')
-        f.write(str(edges))
